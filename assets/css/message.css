@@ -1,0 +1,30 @@
+.message-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr);
+  gap: 64px;
+  align-items: start;
+}
+
+.representative-photo {
+  margin: 0;
+}
+
+.representative-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: 50% 45%;
+  border: 1px solid var(--line);
+}
+
+@media (max-width: 800px) {
+  .message-layout {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .representative-photo {
+    max-width: 520px;
+  }
+}
