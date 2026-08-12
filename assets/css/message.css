@@ -7,15 +7,36 @@
 
 .representative-photo {
   margin: 0;
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 420px);
+  justify-self: end;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  padding: 12px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+.representative-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  transform: translate(10px, 10px);
+  z-index: 0;
 }
 
 .representative-photo img {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  height: 100%;
   object-fit: cover;
-  object-position: 50% 45%;
-  border: 1px solid var(--line);
+  object-position: 50% 26%;
+  border-radius: 50%;
 }
 
 @media (max-width: 800px) {
@@ -25,6 +46,7 @@
   }
 
   .representative-photo {
-    max-width: 520px;
+    width: min(84vw, 360px);
+    justify-self: center;
   }
 }
