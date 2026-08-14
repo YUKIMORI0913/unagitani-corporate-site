@@ -24,6 +24,7 @@ class PageParser(HTMLParser):
         self.h1 = []
         self.meta: list[dict[str, str]] = []
         self.links: list[dict[str, str]] = []
+        self.anchors: list[dict[str, str]] = []
         self.scripts: list[tuple[dict[str, str], str]] = []
         self.images: list[dict[str, str]] = []
         self._capture: str | None = None
@@ -38,6 +39,8 @@ class PageParser(HTMLParser):
             self.meta.append(values)
         elif tag == "link":
             self.links.append(values)
+        elif tag == "a":
+            self.anchors.append(values)
         elif tag == "img":
             self.images.append(values)
         elif tag == "script":
@@ -137,7 +140,7 @@ def audit_site(label: str, base_url: str) -> int:
             failures += not check(False, content_label, str(exc))
 
     internal = []
-    for item in page.links:
+    for item in page.anchors:
         href = item.get("href", "")
         absolute = urljoin(base_url, href)
         if href and urlparse(absolute).netloc == urlparse(base_url).netloc:
