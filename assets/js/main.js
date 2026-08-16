@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const data = window.UNAGITANI_DATA;
   const currentPath = location.pathname;
   const navItems = [
-    ['/company/', 'Company'], ['/business/', 'Business'], ['/compliance/', 'Compliance'],
+    ['/company/', 'Company'], ['/business/', 'Business'], ['/message/', 'Message'], ['/compliance/', 'Compliance'],
     ['/history/', 'History'], ['/brands/', 'Brands'], ['/news/', 'News'], ['/contact/', 'Contact']
   ];
   const header = document.querySelector('.site-header');
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   const footer = document.querySelector('.site-footer');
   if (footer) {
-    footer.innerHTML = '<div class="wrap"><div class="footer-top"><div><a class="logo" href="/"><i></i>UNAGITANI</a><p>株式会社UNAGITANI</p></div><nav class="footer-nav" aria-label="フッターナビ"><a href="/company/">Company</a><a href="/business/">Business</a><a href="/compliance/">Compliance</a><a href="/privacy/">Privacy</a><a href="/contact/">Contact</a></nav></div><p class="copyright">© UNAGITANI Co., Ltd.</p></div>';
+    footer.innerHTML = '<div class="wrap"><div class="footer-top"><div><a class="logo" href="/"><i></i>UNAGITANI</a><p>株式会社UNAGITANI</p></div><nav class="footer-nav" aria-label="フッターナビ"><a href="/company/">Company</a><a href="/business/">Business</a><a href="/message/">Message</a><a href="/compliance/">Compliance</a><a href="/privacy/">Privacy</a><a href="/contact/">Contact</a></nav></div><p class="copyright">© UNAGITANI Co., Ltd.</p></div>';
   }
   const button = document.querySelector('.menu');
   const nav = document.querySelector('.nav-list');
