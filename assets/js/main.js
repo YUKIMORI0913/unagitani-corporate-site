@@ -1,1 +1,95 @@
-document.addEventListener('DOMContentLoaded',()=>{const button=document.querySelector('.menu');const nav=document.querySelector('.nav-list');if(button&&nav){button.addEventListener('click',()=>{const open=nav.classList.toggle('open');button.setAttribute('aria-expanded',String(open));button.textContent=open?'閉じる':'メニュー';});}document.querySelectorAll('[data-unconnected-form]').forEach(form=>form.addEventListener('submit',event=>{event.preventDefault();const notice=form.querySelector('.form-status');notice.hidden=false;notice.focus();}));if(location.pathname==='/'){document.title='株式会社UNAGITANI | 挑戦が続く社会を、流通から支える。';document.querySelector('.hero h1').innerHTML='挑戦が続く社会を、<br>流通から支える。';document.querySelector('.hero p:not(.eyebrow)').textContent='速く、正確な流通で、挑戦が続く社会へ。';document.querySelector('.quote').innerHTML='誠実な流通が、社会の選択肢を広げる。<small>代表取締役 森 佑紀</small>';const visuals=document.querySelectorAll('.visual');if(visuals.length>=2){visuals[0].style.backgroundImage='linear-gradient(rgba(16,26,49,.18),rgba(16,26,49,.48)),url(/assets/images/ecommerce-operations.png)';visuals[1].style.backgroundImage='linear-gradient(rgba(16,26,49,.18),rgba(16,26,49,.48)),url(/assets/images/electric-unagi-products.png)';visuals.forEach(visual=>visual.style.backgroundSize='cover');visuals.forEach(visual=>visual.style.backgroundPosition='center');}document.querySelectorAll('.card').forEach(card=>{if(card.textContent.includes('迅速で誠実な事業運営')){card.querySelector('h3').textContent='現場に近い、迅速な意思決定';card.querySelector('p').textContent='代表自らが現場に向き合い、販売から物流まで正確に運営します。';}});const contact=document.querySelector('main > .section:last-of-type');const additions=document.createElement('section');additions.className='section section-soft';additions.innerHTML='<div class="wrap"><p class="eyebrow">CATEGORIES & CHANNELS</p><h2>暮らしと仕事を支える、<br>幅広い商品を取り扱う。</h2><div class="grid two kicker"><article class="card"><h3>取扱カテゴリー</h3><p>PC、スマートフォン、カメラ、オーディオ、家電、ガジェットなど、日常と仕事に役立つ製品を取り扱います。</p></article><article class="card"><h3>公式販売チャネル</h3><p>Electric UNAGIは、複数のオンラインチャネルで運営しています。</p><p><a class="button" href="https://www.amazon.co.jp/b?node=26286483051&amp;ie=UTF8&amp;marketplaceID=A1VC38T7YXB528&amp;me=A37RHH4EUQHMOH" target="_blank" rel="noopener noreferrer">Amazon</a> <a class="button" href="https://www.rakuten.co.jp/electricunagi/" target="_blank" rel="noopener noreferrer">楽天市場</a> <a class="button" href="https://store.shopping.yahoo.co.jp/electricunagi/" target="_blank" rel="noopener noreferrer">Yahoo!ショッピング</a></p></article></div></div></section><section class="section"><div class="wrap"><p class="eyebrow">OUR COMMITMENT</p><blockquote class="quote">挑戦が続く社会を、流通から支える。<small>誠実な流通が、社会の選択肢を広げる。<br>速く、正確な流通で、挑戦が続く社会へ。</small></blockquote></div></section>';if(contact){contact.before(additions);}}if(location.pathname==='/brands/'){const grid=document.querySelector('.grid.two');if(grid){const brand=document.createElement('article');brand.className='card';brand.innerHTML='<span class="brand-status">公式サイト</span><h2>鰻谷饅頭</h2><p class="lead">鰻谷饅頭の公式サイトをご覧いただけます。</p><p class="kicker"><a class="button" href="https://unagitanibass.wixsite.com/official" target="_blank" rel="noopener noreferrer">公式サイトへ</a></p>';grid.appendChild(brand);}}});
+document.addEventListener('DOMContentLoaded', () => {
+  if (!document.querySelector('link[href="/assets/css/phase1.css"]')) {
+    const stylesheet = document.createElement('link');
+    stylesheet.rel = 'stylesheet';
+    stylesheet.href = '/assets/css/phase1.css';
+    document.head.append(stylesheet);
+  }
+  const data = window.UNAGITANI_DATA;
+  const currentPath = location.pathname;
+  const navItems = [
+    ['/company/', 'Company'], ['/business/', 'Business'], ['/compliance/', 'Compliance'],
+    ['/history/', 'History'], ['/brands/', 'Brands'], ['/news/', 'News'], ['/contact/', 'Contact']
+  ];
+  const header = document.querySelector('.site-header');
+  if (header) {
+    header.innerHTML = `<div class="wrap header-inner"><a class="logo" href="/"><i></i>UNAGITANI</a><button class="menu" type="button" aria-expanded="false" aria-controls="nav">メニュー</button><nav id="nav" aria-label="メインナビゲーション"><ul class="nav-list">${navItems.map(([href, label]) => `<li><a ${currentPath === href ? 'aria-current="page" ' : ''}class="${href === '/contact/' ? 'nav-cta' : ''}" href="${href}">${label}</a></li>`).join('')}</ul></nav></div>`;
+  }
+  const footer = document.querySelector('.site-footer');
+  if (footer) {
+    footer.innerHTML = '<div class="wrap"><div class="footer-top"><div><a class="logo" href="/"><i></i>UNAGITANI</a><p>株式会社UNAGITANI</p></div><nav class="footer-nav" aria-label="フッターナビ"><a href="/company/">Company</a><a href="/business/">Business</a><a href="/compliance/">Compliance</a><a href="/privacy/">Privacy</a><a href="/contact/">Contact</a></nav></div><p class="copyright">© UNAGITANI Co., Ltd.</p></div>';
+  }
+  const button = document.querySelector('.menu');
+  const nav = document.querySelector('.nav-list');
+  if (button && nav) {
+    button.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      button.setAttribute('aria-expanded', String(open));
+      button.textContent = open ? '閉じる' : 'メニュー';
+    });
+  }
+
+  document.querySelectorAll('[data-company-field]').forEach((element) => {
+    const value = data?.company?.[element.dataset.companyField];
+    if (value === null || value === undefined || (Array.isArray(value) && value.length === 0)) {
+      element.closest('[data-company-row]')?.remove();
+      return;
+    }
+    element.textContent = Array.isArray(value) ? value.join('、') : value;
+  });
+
+  const profile = document.querySelector('[data-company-profile]');
+  if (profile && data) {
+    const fields = [
+      ['商号', 'name'], ['英文商号', 'nameEn'], ['代表者', 'representative'], ['所在地', 'address'],
+      ['創業', 'founded'], ['法人設立', 'incorporated'], ['資本金', 'capital'], ['法人番号', 'corporateNumber'],
+      ['事業内容', 'business'], ['決算期', 'fiscalYearEnd'], ['従業員数', 'employees'], ['主要取引銀行', 'banks'],
+      ['古物商許可', 'license'], ['適格請求書発行事業者登録番号', 'invoiceRegistrationNumber'],
+      ['主要販売チャネル', 'channels'], ['主な取扱メーカー', 'manufacturers'], ['公式サイト', 'website']
+    ];
+    fields.forEach(([label, key]) => {
+      const value = data.company[key];
+      if (value === null || value === undefined || (Array.isArray(value) && value.length === 0)) return;
+      const dt = document.createElement('dt');
+      const dd = document.createElement('dd');
+      dt.textContent = label;
+      dd.textContent = Array.isArray(value) ? value.join('、') : value;
+      profile.append(dt, dd);
+    });
+  }
+
+  document.querySelectorAll('[data-financial-highlights]').forEach((container) => {
+    data?.financialHighlights?.forEach((item) => {
+      const article = document.createElement('article');
+      article.className = `financial-card financial-card--${item.type}`;
+      article.innerHTML = `<p>${item.fiscalYear}</p><strong>${item.revenue}</strong><span>${item.label}</span>`;
+      container.append(article);
+    });
+  });
+
+  const history = document.querySelector('[data-history]');
+  data?.history?.forEach((item) => {
+    if (!history) return;
+    const article = document.createElement('article');
+    article.className = 'history-item';
+    article.innerHTML = `<time>${item.year}</time><ul>${item.events.map((event) => `<li>${event}</li>`).join('')}</ul>`;
+    history.append(article);
+  });
+
+  if (data && location.pathname === '/') {
+    const visibleCompany = data.company;
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@graph': [{
+        '@type': 'Corporation', '@id': `${visibleCompany.website}#organization`, name: visibleCompany.name,
+        legalName: visibleCompany.name, alternateName: ['UNAGITANI', visibleCompany.nameEn], url: visibleCompany.website,
+        foundingDate: '2024-10-02', telephone: visibleCompany.telephone,
+        address: { '@type': 'PostalAddress', postalCode: '600-8223', addressRegion: '京都府', addressLocality: '京都市下京区', streetAddress: '七条通油小路東入大黒町227番地 第2キョートビル402' }
+      }, { '@type': 'WebSite', '@id': `${visibleCompany.website}#website`, name: visibleCompany.name, url: visibleCompany.website }]
+    };
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(jsonLd);
+    document.head.append(script);
+  }
+});
