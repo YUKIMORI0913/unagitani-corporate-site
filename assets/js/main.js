@@ -76,20 +76,4 @@ document.addEventListener('DOMContentLoaded', () => {
     history.append(article);
   });
 
-  if (data && location.pathname === '/') {
-    const visibleCompany = data.company;
-    const jsonLd = {
-      '@context': 'https://schema.org',
-      '@graph': [{
-        '@type': 'Corporation', '@id': `${visibleCompany.website}#organization`, name: visibleCompany.name,
-        legalName: visibleCompany.name, alternateName: ['UNAGITANI', visibleCompany.nameEn], url: visibleCompany.website,
-        foundingDate: '2024-10-02', telephone: visibleCompany.telephone,
-        address: { '@type': 'PostalAddress', postalCode: '600-8223', addressRegion: '京都府', addressLocality: '京都市下京区', streetAddress: '七条通油小路東入大黒町227番地 第2キョートビル402' }
-      }, { '@type': 'WebSite', '@id': `${visibleCompany.website}#website`, name: visibleCompany.name, url: visibleCompany.website }]
-    };
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.textContent = JSON.stringify(jsonLd);
-    document.head.append(script);
-  }
 });
