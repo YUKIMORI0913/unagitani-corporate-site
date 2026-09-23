@@ -1,0 +1,24 @@
+name: checks
+
+# 生成物（HTMLへ焼き込んだ会社情報・共通ナビ・sitemap）とデータの
+# 不一致を検出します。ここが落ちる = 検索エンジンが読むHTMLが古い状態です。
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  static-output:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # sitemapのlastmodがコミット日を読むため履歴が必要
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python3 scripts/render_static.py --check
+      - run: python3 scripts/generate_sitemap.py --check
+      - run: python3 scripts/check_company_consistency.py
+      - run: python3 scripts/check_forecasts.py
