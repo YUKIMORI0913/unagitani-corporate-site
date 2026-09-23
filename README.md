@@ -14,6 +14,8 @@ python3 -m http.server 8000
 
 ## 更新方法
 
+- 会社情報（商号・代表者・所在地・売上高・沿革）: `assets/js/company-data.js` を編集し、
+  `python3 scripts/render_static.py` を実行してHTMLへ反映してからコミット
 - 各ページの文章: 該当する `*/index.html`
 - 共通デザイン: `assets/css/style.css`
 - 最小限の動作: `assets/js/main.js`
@@ -21,6 +23,22 @@ python3 -m http.server 8000
 - お知らせ: `news/index.html`（事実確認後にのみ追加）
 
 更新後はPC・スマホ幅で確認し、リンク、title、description、OGP、構造化データを確認してください。未確定事項は `docs/CONTENT_REVIEW.md` で管理します。
+
+### 生成されるHTML
+
+共通ヘッダー・フッター、会社概要、売上高、沿革、不足しているOGPは
+`scripts/render_static.py` が静的HTMLへ書き込みます。JavaScriptだけが本文を
+組み立てる状態では、検索エンジンが最初に取得するHTMLが空になるためです。
+`sitemap.xml` は `scripts/generate_sitemap.py` が生成します。
+
+```bash
+python3 scripts/render_static.py            # 会社情報・共通部分をHTMLへ反映
+python3 scripts/generate_sitemap.py         # sitemap.xml を再生成
+python3 scripts/render_static.py --check    # 反映漏れの検出
+python3 scripts/generate_sitemap.py --check # 反映漏れの検出
+```
+
+コミット前に `--check` を両方通してください。
 
 ## 公開方法
 
@@ -49,5 +67,9 @@ Search Consoleの所有権確認でHTML verification fileを選んだ場合は�
 4. URL検査で `https://corporate.unagitani.com/` を検査する
 5. 「インデックス登録をリクエスト」を実行する
 6. `/about/`、`/business/`、`/brands/`、`/message/`、`/company/`、`/news/`、`/contact/`、`/privacy/` も必要に応じてURL検査する
+
+インデックス登録が進まない場合の診断、Search Consoleのドメインプロパティ設定、
+お名前.comでのTXTレコード追加手順は [docs/SEARCH_INDEXING.md](docs/SEARCH_INDEXING.md)
+にまとめています。
 
 サイトマップ送信や登録リクエストはインデックスを保証するものではありません。掲載可否と反映時期は検索エンジンが判断します。

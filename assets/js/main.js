@@ -11,12 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
     ['/company/', 'Company'], ['/business/', 'Business'], ['/message/', 'Message'], ['/compliance/', 'Compliance'],
     ['/history/', 'History'], ['/brands/', 'Brands'], ['/news/', 'News'], ['/contact/', 'Contact']
   ];
+  // ヘッダー・フッター・会社情報は scripts/render_static.py が静的HTMLへ焼き込み済みです。
+  // 検索エンジンが最初に取得するHTMLに内容が含まれるよう、JS側は空のときだけ描画します。
   const header = document.querySelector('.site-header');
-  if (header) {
+  if (header && !header.children.length) {
     header.innerHTML = `<div class="wrap header-inner"><a class="logo" href="/"><i></i>UNAGITANI</a><button class="menu" type="button" aria-expanded="false" aria-controls="nav">メニュー</button><nav id="nav" aria-label="メインナビゲーション"><ul class="nav-list">${navItems.map(([href, label]) => `<li><a ${currentPath === href ? 'aria-current="page" ' : ''}class="${href === '/contact/' ? 'nav-cta' : ''}" href="${href}">${label}</a></li>`).join('')}</ul></nav></div>`;
   }
   const footer = document.querySelector('.site-footer');
-  if (footer) {
+  if (footer && !footer.children.length) {
     footer.innerHTML = '<div class="wrap"><div class="footer-top"><div><a class="logo" href="/"><i></i>UNAGITANI</a><p>株式会社UNAGITANI</p></div><nav class="footer-nav" aria-label="フッターナビ"><a href="/company/">Company</a><a href="/business/">Business</a><a href="/message/">Message</a><a href="/compliance/">Compliance</a><a href="/privacy/">Privacy</a><a href="/contact/">Contact</a></nav></div><p class="copyright">© UNAGITANI Co., Ltd.</p></div>';
   }
   const button = document.querySelector('.menu');
@@ -35,11 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
       element.closest('[data-company-row]')?.remove();
       return;
     }
+    if (element.textContent.trim()) return;
     element.textContent = Array.isArray(value) ? value.join('、') : value;
   });
 
   const profile = document.querySelector('[data-company-profile]');
-  if (profile && data) {
+  if (profile && data && !profile.children.length) {
     const fields = [
       ['商号', 'name'], ['英文商号', 'nameEn'], ['代表者', 'representative'], ['所在地', 'address'],
       ['創業', 'founded'], ['法人設立', 'incorporated'], ['資本金', 'capital'], ['法人番号', 'corporateNumber'],
@@ -59,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.querySelectorAll('[data-financial-highlights]').forEach((container) => {
+    if (container.children.length) return;
     data?.financialHighlights?.forEach((item) => {
       const article = document.createElement('article');
       article.className = `financial-card financial-card--${item.type}`;
@@ -68,8 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const history = document.querySelector('[data-history]');
+  const historyIsEmpty = Boolean(history) && !history.children.length;
   data?.history?.forEach((item) => {
-    if (!history) return;
+    if (!historyIsEmpty) return;
     const article = document.createElement('article');
     article.className = 'history-item';
     article.innerHTML = `<time>${item.year}</time><ul>${item.events.map((event) => `<li>${event}</li>`).join('')}</ul>`;
