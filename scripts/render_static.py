@@ -73,6 +73,13 @@ STYLESHEET = '<link rel="stylesheet" href="/assets/css/phase1.css">'
 
 DEFAULT_OG_IMAGE = "https://corporate.unagitani.com/assets/images/ecommerce-operations.png"
 SITE_NAME = "株式会社UNAGITANI"
+BASE_URL = "https://corporate.unagitani.com"
+ORGANIZATION_ID = f"{BASE_URL}/#organization"
+WEBSITE_ID = f"{BASE_URL}/#website"
+
+# 生成するJSON-LDの差し込み位置。再実行時はこの区間を丸ごと置き換えます。
+SEO_OPEN = "<!--seo-->"
+SEO_CLOSE = "<!--/seo-->"
 
 
 def load_company_data() -> dict:
@@ -190,7 +197,7 @@ def render_history(history: list[dict]) -> str:
     )
 
 
-def apply(html: str, data: dict, path: str) -> str:
+def apply(html: str, data: dict, path: str, names: dict[str, str] | None = None) -> str:
     company = data["company"]
     html = replace_inner(html, 'class="site-header"', render_header(path), required=True)
     html = replace_inner(html, 'class="site-footer"', render_footer(), required=True)
@@ -214,6 +221,7 @@ def apply(html: str, data: dict, path: str) -> str:
         cursor = match.end() + len(escape(as_text(value)))
 
     html = ensure_ogp(html)
+    html = apply_seo_block(html, render_seo_block(html, path, names or {}))
 
     if STYLESHEET not in html:
         html = html.replace(
@@ -222,6 +230,82 @@ def apply(html: str, data: dict, path: str) -> str:
             1,
         )
     return html
+
+
+def page_name(html: str) -> str:
+    """<title>の「 | 」より前をページ名として使います。"""
+    title = re.search(r"<title>(.*?)</title>", html, re.S)
+    if not title:
+        return ""
+    return title.group(1).split(" | ")[0].strip()
+
+
+def breadcrumb(path: str, names: dict[str, str]) -> dict:
+    """/news/xxx/ を ホーム > お知らせ > 記事名 に展開します。"""
+    trail = [("ホーム", "/")]
+    segments = [segment for segment in path.split("/") if segment]
+    for index in range(len(segments)):
+        ancestor = "/" + "/".join(segments[: index + 1]) + "/"
+        if ancestor in names:
+            trail.append((names[ancestor], ancestor))
+    return {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": position, "name": name, "item": BASE_URL + url}
+            for position, (name, url) in enumerate(trail, start=1)
+        ],
+    }
+
+
+def news_article(html: str, path: str, name: str) -> dict | None:
+    published = re.search(r'<time datetime="([^"]+)"', html)
+    if not published:
+        return None
+    return {
+        "@type": "NewsArticle",
+        "@id": f"{BASE_URL}{path}#article",
+        "headline": name,
+        "datePublished": published.group(1),
+        "inLanguage": "ja",
+        "mainEntityOfPage": f"{BASE_URL}{path}",
+        "author": {"@id": ORGANIZATION_ID},
+        "publisher": {"@id": ORGANIZATION_ID},
+    }
+
+
+def render_seo_block(html: str, path: str, names: dict[str, str]) -> str:
+    """トップページ以外へ、パンくずとページ種別の構造化データを生成します。"""
+    if path == "/":
+        return ""
+    name = names.get(path, page_name(html))
+    page_type = "AboutPage" if path in ("/about/", "/company/") else "WebPage"
+    graph: list[dict] = [
+        {
+            "@type": page_type,
+            "@id": f"{BASE_URL}{path}#webpage",
+            "url": f"{BASE_URL}{path}",
+            "name": name,
+            "inLanguage": "ja",
+            "isPartOf": {"@id": WEBSITE_ID},
+            "about": {"@id": ORGANIZATION_ID},
+        },
+        breadcrumb(path, names),
+    ]
+    if path.startswith("/news/") and path != "/news/":
+        article = news_article(html, path, name)
+        if article:
+            graph.append(article)
+    payload = json.dumps({"@context": "https://schema.org", "@graph": graph}, ensure_ascii=False, separators=(",", ":"))
+    return f'{SEO_OPEN}<script type="application/ld+json">{payload}</script>{SEO_CLOSE}'
+
+
+def apply_seo_block(html: str, block: str) -> str:
+    existing = re.search(re.escape(SEO_OPEN) + ".*?" + re.escape(SEO_CLOSE), html, re.S)
+    if existing:
+        return html.replace(existing.group(0), block, 1)
+    if not block:
+        return html
+    return html.replace("</head>", block + "</head>", 1)
 
 
 def ensure_ogp(html: str) -> str:
@@ -255,11 +339,12 @@ def main() -> int:
     data = load_company_data()
     drifted: list[str] = []
 
-    for file in sorted(ROOT.glob("**/*.html")):
-        if ".git" in file.parts:
-            continue
+    pages = [file for file in sorted(ROOT.glob("**/*.html")) if ".git" not in file.parts]
+    names = {page_path(file): page_name(file.read_text(encoding="utf-8")) for file in pages}
+
+    for file in pages:
         original = file.read_text(encoding="utf-8")
-        rendered = apply(original, data, page_path(file))
+        rendered = apply(original, data, page_path(file), names)
         if rendered == original:
             continue
         if check_only:
