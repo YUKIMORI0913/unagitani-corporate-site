@@ -20,6 +20,8 @@ from urllib.request import Request, urlopen
 SITES = {
     "Corporate": {
         "base": "https://corporate.unagitani.com/",
+        # 公開されてはいけない内部ファイル。_config.yml の exclude が効いていれば 404 になる
+        "must_404": ["README.md", "docs/CONTENT_REVIEW.md", "scripts/render_static.py"],
         # JSを実行しない状態で、本文に必ず含まれていてほしい文字列
         "pages": {
             "/": ["株式会社UNAGITANI", "2025年9月期"],
@@ -32,6 +34,7 @@ SITES = {
     },
     "Manju": {
         "base": "https://manju.unagitani.com/",
+        "must_404": ["README.md", "admin/", "photo_admin.py", "GOOGLE_INDEXING_MANJU.md", "docs/CONTENT_REVIEW.md"],
         "pages": {
             "/": ["鰻谷饅頭", "ECLECTICISM"],
             "/gallery.html": ["photo-slot", "figcaption"],
@@ -207,6 +210,26 @@ def audit_site(label: str, config: dict) -> int:
         failures += audit_page(base_url, path, required)
 
     failures += audit_sitemap_urls(base_url)
+    failures += audit_private_paths(base_url, config.get("must_404", []))
+    return failures
+
+
+def audit_private_paths(base_url: str, paths: list[str]) -> int:
+    """内部ファイルが本番で 404 になっているか確認します。"""
+    if not paths:
+        return 0
+    print("\n  公開されてはいけないファイル")
+    failures = 0
+    for path in paths:
+        url = urljoin(base_url, path)
+        try:
+            status, _, _, _ = fetch(url)
+        except HTTPError as exc:
+            failures += not check(exc.code == 404, url, f"{exc.code}")
+        except (URLError, TimeoutError) as exc:
+            failures += not check(False, url, str(exc))
+        else:
+            failures += not check(False, url, f"{status}（公開されています）")
     return failures
 
 

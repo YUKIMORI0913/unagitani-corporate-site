@@ -1,0 +1,13 @@
+# GitHub Pages（Jekyll）の公開設定。
+#
+# Jekyll はリポジトリ内のファイルをほぼすべて公開します。内部メモ、
+# 生成スクリプト、README は公開サイトに不要で、検索エンジンに拾われると
+# サイトの品質評価を下げ、社内の確認事項も漏れます。ここで除外します。
+#
+# 公開が必要なもの: 各ページの index.html, assets/, favicon.svg,
+# robots.txt, sitemap.xml, CNAME（Jekyll が自動で引き継ぎます）
+
+exclude:
+  - docs
+  - scripts
+  - README.md
