@@ -13,10 +13,10 @@ window.UNAGITANI_DATA = Object.freeze({
     channels: "Amazon、楽天市場、Yahoo!ショッピング等",
     website: "https://corporate.unagitani.com/",
     capital: null,
-    corporateNumber: null,
+    corporateNumber: "3130001078086",
     employees: null,
     banks: [],
-    invoiceRegistrationNumber: null,
+    invoiceRegistrationNumber: "T3130001078086",
     manufacturers: []
   },
   financialHighlights: [
