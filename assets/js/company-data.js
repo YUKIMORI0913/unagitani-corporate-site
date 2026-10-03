@@ -20,7 +20,7 @@ window.UNAGITANI_DATA = Object.freeze({
     manufacturers: []
   },
   financialHighlights: [
-    { fiscalYear: "2025年9月期", type: "actual", label: "売上高実績", revenue: "約5.0億円" },
+    { fiscalYear: "2025年9月期", type: "actual", label: "売上高実績", revenue: "約4.8億円" },
     { fiscalYear: "2026年9月期", type: "actual", label: "売上高実績", revenue: "約11.4億円" }
   ],
   history: [
