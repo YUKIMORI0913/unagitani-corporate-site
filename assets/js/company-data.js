@@ -21,7 +21,7 @@ window.UNAGITANI_DATA = Object.freeze({
   },
   financialHighlights: [
     { fiscalYear: "2025年9月期", type: "actual", label: "売上高実績", revenue: "約5.0億円" },
-    { fiscalYear: "2026年9月期", type: "forecast", label: "売上高見込み", revenue: "約11〜12億円", reviewAfter: "2026-10-31" }
+    { fiscalYear: "2026年9月期", type: "actual", label: "売上高実績", revenue: "約11.4億円" }
   ],
   history: [
     { year: "2021", events: ["EC事業を開始"] },
